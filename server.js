@@ -3,7 +3,7 @@ const helmet = require("helmet");
 const http = require("http");
 const socketio = require("socket.io");
 const path = require("path");
-const Log = require("./js/logger");
+const Log = require("./js/logger.js");
 
 
 function Server() {
