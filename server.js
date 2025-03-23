@@ -3,8 +3,7 @@ const helmet = require("helmet");
 const http = require("http");
 const socketio = require("socket.io");
 const path = require("path");
-const Log = require("./logger.js"); // Make sure this file exists
-const Utils = require("./utils.js"); // Optional, depending on what you use
+const Log = require("./logger.js");
 
 function Server() {
   const app = express();
@@ -16,23 +15,17 @@ function Server() {
     }
   });
 
-  // Use security best practices
   app.use(helmet());
+  app.use(express.static(path.resolve(__dirname + "/../")));
 
-  // Serve static files (your MagicMirror UI)
-  app.use(express.static(path.resolve(__dirname, "..")));
-
-  // Endpoint to check server uptime
   app.get("/startup", (req, res) => {
     res.send(process.uptime().toString());
   });
 
-  // Version check
   app.get("/version", (req, res) => {
-    res.json({ version: global.version || "unknown" });
+    res.json({ version: global.version });
   });
 
-  // WebSocket connection handler
   io.on("connection", function (socket) {
     Log.log("A client connected.");
 
@@ -40,13 +33,15 @@ function Server() {
       Log.log("A client disconnected.");
     });
 
-    // You can add custom socket handlers here
+    // Add more socket listeners here as needed
   });
 
   return {
     listen: function (port) {
-      server.listen(port, () => {
-        Log.log(`Server is running on port ${port}`);
+      // Use port from environment, or default to 8080
+      const actualPort = process.env.PORT || port || 8080;
+      server.listen(actualPort, "0.0.0.0", () => {
+        Log.log(`Server is running on port ${actualPort}`);
       });
     }
   };
